@@ -36,20 +36,29 @@ public class GameMap {
         currentLayer.update( ms );
         if( currentLayer.goNextLevel || currentLayer.goPreviousLevel ){
             
+            //associate this old level with this old level index, in case it hasn't already been
             visitedLevels.put( mapLevel, currentLayer );
+            
+            //change the level index
             mapLevel -= ( currentLayer.goNextLevel ? 1 : -1 );
             
+            //remove the player and flags from the old level
             currentLayer.goNextLevel = false;
             currentLayer.goPreviousLevel = false;
             currentLayer.removePlayer();
             
+            //create/load a level based on the updated level index
             if( visitedLevels.containsKey( mapLevel ) ){
                 currentLayer = visitedLevels.get( mapLevel );
             }else
                 currentLayer = buildLayer( mapLevel );
+            
+            //place the player in the new level, just below the ladder
             Global.player.yPos -= Global.tileSize;
-            visitedLevels.put( mapLevel, currentLayer );
             currentLayer.addActor( Global.player );
+            
+            //associate the new level index with the new level object
+            visitedLevels.put( mapLevel, currentLayer );
         }
     }
     
