@@ -22,6 +22,10 @@ public class PlayScreen extends Screen{
     
     private final GameMap map;
     
+    private String hudMessage = null;
+    private static final long hudMessageDuration = 2000;
+    private long hudMessageTimer = 0;
+    
     @Override
     public void draw(CGraphics g) {
         int camX = -(int)Global.player.xPos + Global.screenWidth/2 - 12;
@@ -38,11 +42,25 @@ public class PlayScreen extends Screen{
         g.translate( -camX, -camY );
         
         g.drawString( "POS: " + ((int)Global.player.xPos/Global.tileSize) + ", " + ((int)Global.player.yPos/Global.tileSize), 50, 0 );
+        
+        if( hudMessage != null )
+            g.drawStringCentered( hudMessage, Global.screenWidth/2, Global.screenHeight/2+Global.tileSize*2 );
     }
 
     @Override
     public void update(long ms) {
         map.update( ms );
+        
+        if( hudMessageTimer >= 0 ) 
+            hudMessageTimer -= ms;
+        else{
+            if( Global.messageQueue.isEmpty() )
+                hudMessage = null;
+            else{
+                hudMessage = Global.messageQueue.remove( 0 );
+                hudMessageTimer = hudMessageDuration;
+            }
+        }
+                
     }
-    
 }

@@ -22,10 +22,10 @@ public class RawImageHandler {
     private RawImageHandler(){
         System.out.print( "loading raw images from resources... " );
         for( String s : new String[]{
-            "doors", "font", /*"grass",/* "objects_raw", /*"people",*/ "pokecenter",
+            "diglett","doors", "font", /*"grass",/* "objects_raw", /*"people",*/ "pokecenter",
             "overworld_tiles", /*"tree",*/ "harvested_tree", "interiors", "exit_tile",
             "water_animation", "shoreline_animation", "grass_sand_edge", 
-            "oldale_grass_edge", "upladder", "secret_base_tiles", "cave_tiles"/*"player"*/
+            "oldale_grass_edge", /*"upladder",*/ "secret_base_tiles", "cave_tiles"/*"player"*/
         })
         resourceImages.put( s, loadResourceImage( s + ".png" ) );
         System.out.println( "done!" );

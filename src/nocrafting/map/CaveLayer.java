@@ -7,12 +7,8 @@
 package nocrafting.map;
 
 import gfx.CGraphics;
-import java.util.ArrayList;
-import java.util.List;
 import nocrafting.Global;
-import nocrafting.actors.RandomPerson;
-import nocrafting.map.flavor.GrassTuft;
-import nocrafting.map.flavor.Tree;
+import nocrafting.actors.Diglett;
 
 /**
  *
@@ -56,6 +52,8 @@ public class CaveLayer extends MapLayer {
             for( int y = 0 ; y < h ; y++ )
                 if( getD2FromCenter(x,y) < r2 )
                     result[x][y] = CaveTileset.INDEX_FLOOR;
+        
+        addActor( new Diglett( (w/2+3)*Global.tileSize, (h/2)*Global.tileSize ) );
         
         //assign appropriate corner/edge tiles
         for( int x = 1 ; x < w-1 ; x++ ){

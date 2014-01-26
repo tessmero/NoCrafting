@@ -4,6 +4,8 @@
  */
 package nocrafting;
 
+import java.util.ArrayList;
+import java.util.List;
 import nocrafting.actors.Player;
 
 /**
@@ -25,4 +27,6 @@ public class Global {
     
     //THE ONE AND ONLY PLAYER
     public static final Player player = new Player( tileSize*2,tileSize*2 );
+    
+    public static final List< String > messageQueue = new ArrayList();
 }

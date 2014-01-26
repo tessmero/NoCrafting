@@ -79,6 +79,10 @@ public class ActorAnimState {
         updateAnimIndex();
     }
     
+    //anim frames 0-2 : up
+    //anim frames 3-5 : right
+    //anim frames 6-8 : down
+    //anim frames 9-11 : left
     public void updateAnimIndex(){
         animIndex = getDirection()*3+1;
         if( getState() == ActorAnimState.STATE_WALKING && walkingStage != 3 )

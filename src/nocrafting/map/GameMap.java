@@ -26,6 +26,7 @@ public class GameMap {
         currentLayer = new OverworldLayer();
         currentLayer.addActor( Global.player.setTilePosition( 
                 currentLayer.getSpawnX(), currentLayer.getSpawnY() ) );
+        Global.messageQueue.add( "you should explore" );
     }
     
     public void draw( CGraphics g ){
@@ -67,6 +68,7 @@ public class GameMap {
     private MapLayer buildLayer( int level ){
         MapLayer result = new CaveLayer();
         result.addObject( new UpLadder( (int)Global.player.xPos, (int)Global.player.yPos ) );
+        Global.messageQueue.add( "press [c] to capture" );
         return result;
     }
 }
