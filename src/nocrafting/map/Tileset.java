@@ -51,4 +51,6 @@ public abstract class Tileset {
     abstract protected Map< Integer, CImage[] > buildMinitileAnimations();
     
     abstract public void assignEdgeMinitiles( int[] nineTiles, int[] output );
+    
+    abstract public boolean isTileIDWalkable( int id );
 }

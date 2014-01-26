@@ -227,4 +227,9 @@ public class OverworldTileset extends Tileset{
             out[3] = 4 + startIndex;
         //</editor-fold>
     }
+
+    @Override
+    public boolean isTileIDWalkable(int id) {
+        return id != INDEX_OCEAN;
+    }
 }

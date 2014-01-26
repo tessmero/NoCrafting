@@ -34,6 +34,8 @@ public class GameMap {
     
     public void update( long ms ){
         currentLayer.update( ms );
+        
+        //check for flags thrown when player stands on a ladder
         if( currentLayer.goNextLevel || currentLayer.goPreviousLevel ){
             
             //associate this old level with this old level index, in case it hasn't already been

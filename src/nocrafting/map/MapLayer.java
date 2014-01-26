@@ -37,6 +37,9 @@ public abstract class MapLayer {
     //dimensions in number of tiles
     protected final int w,h;
     
+    //class determining the graphical style
+    private final Tileset tileset;
+    
     //contains layout information
     protected final int[][] layoutArr;
     
@@ -55,6 +58,7 @@ public abstract class MapLayer {
     public MapLayer( Tileset tileset, int w, int h ){
         this.w = w;
         this.h = h;
+        this.tileset = tileset;
         layoutArr = buildLayoutArr();
         tileImages = tileset.buildTiles();
         minitileImages = tileset.buildMinitiles();
@@ -222,7 +226,7 @@ public abstract class MapLayer {
             if( TiledObject.class.isAssignableFrom(o.getClass()) )
                 if( !((TiledObject)o).isWalkable() && ((TiledObject)o).containsTile( xIndex, yIndex ) )
                     return false;
-        return layoutArr[xIndex][yIndex] != OverworldTileset.INDEX_OCEAN;
+        return tileset.isTileIDWalkable( layoutArr[xIndex][yIndex] );
     }
     
     //spawn location as tile index
@@ -264,7 +268,7 @@ public abstract class MapLayer {
         if( x < w-1 )
             edgeTileInput[5] = layoutArr[x+1][y];
 
-        OverworldTileset.getInstance().assignEdgeMinitiles(edgeTileInput, edgeTileOutput);
+        tileset.assignEdgeMinitiles(edgeTileInput, edgeTileOutput);
 
         for( i = 0 ; i < 4 ; i++ )
             miniTileLayout[i][x][y] = edgeTileOutput[i];

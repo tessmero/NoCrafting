@@ -20,7 +20,6 @@ import nocrafting.map.flavor.Tree;
  */
 public class CaveLayer extends MapLayer {
   
-    
     public CaveLayer(){
         super( CaveTileset.getInstance(),60,60 );
     }
@@ -52,13 +51,110 @@ public class CaveLayer extends MapLayer {
                 result[x][y] = CaveTileset.INDEX_WALL;
         
         //create a circle of walkable floor
-        int r2 = 20*20;
+        int r2 = 50;
         for( int x = 0 ; x < w ; x++ )
             for( int y = 0 ; y < h ; y++ )
                 if( getD2FromCenter(x,y) < r2 )
                     result[x][y] = CaveTileset.INDEX_FLOOR;
         
+        //assign appropriate corner/edge tiles
+        for( int x = 1 ; x < w-1 ; x++ ){
+            for( int y = 1 ; y < h-1 ; y++ ){
+                updateTile( x, y, result );
+            }
+        }
+        
         return result;
+    }
+    
+    private static final int f = CaveTileset.INDEX_FLOOR;
+    private void updateTile( int x, int y, int[][] layout ){
+        if( layout[x][y] == f )
+            return;
+        if( layout[x-1][y] == f ){
+            if( layout[x+1][y] == f ){
+                layout[x][y] = CaveTileset.INDEX_ISLAND;
+            }else{
+                if( layout[x][y-1] == f ){
+                    if( layout[x][y+1] == f ){
+                        layout[x][y] = CaveTileset.INDEX_ISLAND;
+                    }else{
+                        layout[x][y] = CaveTileset.INDEX_SW_WALL;
+                    }
+                }else{
+                    if( layout[x][y+1] == f ){
+                        layout[x][y] = CaveTileset.INDEX_NW_WALL;
+                    }else{
+                        layout[x][y] = CaveTileset.INDEX_W_WALL;
+                    }
+                }
+            }
+        }else{
+            if( layout[x+1][y] == f ){
+                if( layout[x][y+1] == f ){
+                    if( layout[x][y-1] == f ){
+                        layout[x][y] = CaveTileset.INDEX_ISLAND;
+                    }else{
+                        layout[x][y] = CaveTileset.INDEX_NE_WALL;
+                    }
+                }else{
+                    if( layout[x][y-1] == f ){
+                        layout[x][y] = CaveTileset.INDEX_SE_WALL;
+                    }else{
+                        layout[x][y] = CaveTileset.INDEX_E_WALL;
+                    }
+                }
+            }else{
+                if( layout[x][y+1] == f ){
+                    if( layout[x][y-1] == f ){
+                        layout[x][y] = CaveTileset.INDEX_ISLAND;
+                    }else{
+                        layout[x][y] = CaveTileset.INDEX_N_WALL;
+                    }
+                }else{
+                    if( layout[x][y-1] == f ){
+                        layout[x][y] = CaveTileset.INDEX_S_WALL;
+                    }
+                }
+            }
+        }if( layout[x][y] == CaveTileset.INDEX_WALL ){
+            readCorners( x, y, layout );
+            if( corners[0] ){
+                if( corners[1] )
+                    layout[x][y] = CaveTileset.INDEX_ISLAND;
+                else if( corners[2] )
+                    layout[x][y] = CaveTileset.INDEX_ISLAND;
+                else if( corners[3] )
+                    layout[x][y] = CaveTileset.INDEX_ISLAND;
+                else
+                    layout[x][y] = CaveTileset.INDEX_SW_BEND;
+            }else{
+                if( corners[1] ){
+                    if( corners[2] )
+                        layout[x][y] = CaveTileset.INDEX_ISLAND;
+                    else if( corners[3] )
+                        layout[x][y] = CaveTileset.INDEX_ISLAND;
+                    else
+                        layout[x][y] = CaveTileset.INDEX_NW_BEND;
+                }else{
+                    if( corners[2] ){
+                        if( corners[3] )
+                            layout[x][y] = CaveTileset.INDEX_ISLAND;
+                        else
+                            layout[x][y] = CaveTileset.INDEX_NE_BEND;
+                    }else if( corners[3] )
+                        layout[x][y] = CaveTileset.INDEX_SE_BEND;                            
+                }
+            }
+        }
+    }
+    
+    private static final boolean[] corners = new boolean[4];
+    private void readCorners( int x, int y, int[][] layout ){
+        corners[0] = layout[x-1][y-1] == f;
+        corners[1] = layout[x-1][y+1] == f;
+        corners[2] = layout[x+1][y+1] == f;
+        corners[3] = layout[x+1][y-1] == f;
     }
     
     private int getD2FromCenter( int x, int y ){
