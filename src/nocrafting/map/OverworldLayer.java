@@ -113,4 +113,9 @@ public class OverworldLayer extends MapLayer {
                 return true;
         return false;
     }
+
+    @Override
+    protected void applyEffect(MapEffect effect, int tileX, int tileY) {
+        //do nothing
+    }
 }

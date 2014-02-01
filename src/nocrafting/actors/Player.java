@@ -18,10 +18,6 @@ import org.lwjgl.input.Keyboard;
  */
 public class Player extends Person{
     //keybindings
-    private static final int KEY_LEFT   = Keyboard.KEY_A;
-    private static final int KEY_RIGHT  = Keyboard.KEY_D;
-    private static final int KEY_UP     = Keyboard.KEY_W;
-    private static final int KEY_DOWN   = Keyboard.KEY_S;
     
     //Player should ONLY be constructed in global
     public Player(int xPos, int yPos){super(xPos, yPos);}
@@ -36,19 +32,19 @@ public class Player extends Person{
     public void update( List< MapObject > objs, long ms ){
         super.update( objs, ms );
         
-        if( Keyboard.isKeyDown( KEY_LEFT ) ){
+        if( Keyboard.isKeyDown( Global.KEY_MOVE_LEFT ) ){
             state.setDirection( ActorAnimState.DIR_LEFT );
             state.setState( ActorAnimState.STATE_WALKING );
         
-        }else if( Keyboard.isKeyDown( KEY_RIGHT ) ){
+        }else if( Keyboard.isKeyDown( Global.KEY_MOVE_RIGHT ) ){
             state.setDirection( ActorAnimState.DIR_RIGHT );
             state.setState( ActorAnimState.STATE_WALKING );
         
-        }else if( Keyboard.isKeyDown( KEY_UP ) ){
+        }else if( Keyboard.isKeyDown( Global.KEY_MOVE_UP ) ){
             state.setDirection( ActorAnimState.DIR_UP );
             state.setState( ActorAnimState.STATE_WALKING );
         
-        }else if( Keyboard.isKeyDown( KEY_DOWN ) ){
+        }else if( Keyboard.isKeyDown( Global.KEY_MOVE_DOWN ) ){
             state.setDirection( ActorAnimState.DIR_DOWN );
             state.setState( ActorAnimState.STATE_WALKING );
         

@@ -12,6 +12,7 @@ import gfx.CImage;
 import gfx.Drawable;
 import java.util.List;
 import nocrafting.Global;
+import nocrafting.map.MapEffect;
 
 /**
  *
@@ -38,6 +39,9 @@ public abstract class Actor implements Drawable{
     
     //stores state information related to animation
     public final ActorAnimState state;
+    
+    //set as non-null if the actor is effecting the game map
+    public MapEffect currentEffect = null;
     
     public Actor( int xPos, int yPos ){
         this.xPos = xPos;

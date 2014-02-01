@@ -105,6 +105,10 @@ public class CGraphics {
         }
     }
     
+    public void drawImageCentered( CImage ci, int ox, int oy ){
+        drawImage( ci, ox-ci.w/2, oy-ci.h/2 );
+    }
+    
     public void drawImage( CImage ci ){
         int i = 0;
         for( int y = 0 ; y < ci.h ; y++ ){

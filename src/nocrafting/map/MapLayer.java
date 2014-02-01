@@ -165,6 +165,10 @@ public abstract class MapLayer {
                 a.hittingObstacle = true;
             }else
                 a.hittingObstacle = false;
+            if( a.currentEffect != null ){
+                applyEffect( a.currentEffect, x, y );
+                a.currentEffect = null;
+            }
         }
         
         //check if the player is an a ladder
@@ -206,6 +210,8 @@ public abstract class MapLayer {
             }
         }
     }
+    
+    abstract protected void applyEffect( MapEffect effect, int tileX, int tileY );
     
     private boolean isTileOccupied( int tx, int ty, Actor except ){
         if( occupiedTiles[tx][ty] )

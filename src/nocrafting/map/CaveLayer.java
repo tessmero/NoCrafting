@@ -64,6 +64,17 @@ public class CaveLayer extends MapLayer {
         
         return result;
     }
+   
+    @Override
+    protected void applyEffect(MapEffect effect, int tileX, int tileY) {
+        switch( effect ){
+            case DIG:
+                layoutArr[tileX][tileY] = CaveTileset.INDEX_FLOOR;
+                for( int x = tileX-1 ; x <= tileX+1 ; x++ )
+                    for( int y = tileY-1 ; y <= tileY+1 ; y++ )
+                        updateTile( x, y, layoutArr );
+        }
+    }
     
     private static final int f = CaveTileset.INDEX_FLOOR;
     private void updateTile( int x, int y, int[][] layout ){

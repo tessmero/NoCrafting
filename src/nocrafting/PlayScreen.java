@@ -41,6 +41,8 @@ public class PlayScreen extends Screen{
         
         g.translate( -camX, -camY );
         
+        Global.playerBelt.drawHudView( g );
+        
         g.drawString( "POS: " + ((int)Global.player.xPos/Global.tileSize) + ", " + ((int)Global.player.yPos/Global.tileSize), 50, 0 );
         
         if( hudMessage != null )
