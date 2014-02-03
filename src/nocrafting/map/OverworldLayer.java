@@ -35,12 +35,12 @@ public class OverworldLayer extends MapLayer {
         return 15;
     }
     
-    @Override
-    public void draw( CGraphics g ){
-        
-        //draw layer tiles the standard way
-        super.draw( g );
-    }
+//    @Override
+//    public void draw( CGraphics g ){
+//        
+//        //draw layer tiles the standard way
+//        super.draw( g );
+//    }
 
     @Override
     protected int[][] buildLayoutArr() {
@@ -82,15 +82,15 @@ public class OverworldLayer extends MapLayer {
         
         for( TiledObject to : toAdd )
             addObject( to );
-        
-        //add grass tufts where there is grass, but no object
-        for( int x = 0 ; x < w ; x++ )
-            for( int y = 0 ; y < h ; y++ )
-                if( result[x][y] == OverworldTileset.INDEX_GRASS )
-                    for( int i = 0 ; i < 2 ; i++ )
-                        addObject( new GrassTuft( 
-                            x*Global.tileSize+(int)(Math.random()*Global.tileSize)-3, 
-                            y*Global.tileSize+(int)(Math.random()*Global.tileSize)-2 ) );
+//        
+//        //add grass tufts where there is grass, but no object
+//        for( int x = 0 ; x < w ; x++ )
+//            for( int y = 0 ; y < h ; y++ )
+//                if( result[x][y] == OverworldTileset.INDEX_GRASS )
+//                    for( int i = 0 ; i < 2 ; i++ )
+//                        addObject( new GrassTuft( 
+//                            x*Global.tileSize+(int)(Math.random()*Global.tileSize)-3, 
+//                            y*Global.tileSize+(int)(Math.random()*Global.tileSize)-2 ) );
         
         //add some random people
         int x = 40, y = 40;

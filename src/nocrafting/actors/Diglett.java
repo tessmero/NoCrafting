@@ -8,23 +8,42 @@ package nocrafting.actors;
 
 import gfx.CImage;
 import java.util.List;
+import nocrafting.Global;
 import nocrafting.map.MapEffect;
 import nocrafting.map.MapObject;
+import org.lwjgl.input.Keyboard;
 
 /**
  *
  * @author Oliver
  */
-public class Diglett extends RandomPerson implements Pokemon{
-
+public class Diglett extends Pokemon{
+    
     public Diglett(int xPos, int yPos) {
         super(xPos, yPos);
     }
-
+    
+    @Override
+    public void startSummonBehavior( int dir ) {
+        summoned = true;
+        state.setDirection( dir );
+        state.setState( ActorAnimState.STATE_WALKING);
+        state.update( 0, true );
+        currentEffect = new MapEffect.Dig( this );
+    }
+    
     @Override
     public void update( List<MapObject> l, long ms ){
-        super.update( l, ms );
-        currentEffect = MapEffect.DIG;
+        if( summoned ){
+            state.update( ms, onTile() );
+            walkDist = Math.min( maxWalkDist, ms*walkSpeed );
+            xPos += state.getDx()*walkDist;
+            yPos += state.getDy()*walkDist;
+            if( !Keyboard.isKeyDown( Global.KEY_USE_POKEMON ) )
+                summoned = false;
+        }else
+            super.update( l, ms );
+        currentEffect = new MapEffect.Dig( this );
     }
     
     @Override
@@ -64,4 +83,5 @@ public class Diglett extends RandomPerson implements Pokemon{
     };
     
     private static final CImage icon = new CImage( "14:12:000000006D6D6D6D6D6D0000000000006D6DB6B66D6D6D6D6D6D0000006DB66D6D6D6D6DB66D6D6D6D006DB66D6D6DB1B1B16D6D6D6D6D6D6DB66D49B1B1B1B1B1B1496D6D6D006D6D49B14949B1B1B1496D6D0000006D4949EDED6DB1B1496D000000000049EDED6D49B1B14900000000000049B149B1FFD6B1490000000000006DB1FFD6D6D6B16D0000000000000049D6D6D6B149000000000000000000494949490000000000:000011111100000011111111110001111111111110111111111111111111111111111101111111111110001111111111000001111111100000011111111000000111111110000000111111000000000111100000" );
+
 }

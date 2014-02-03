@@ -10,8 +10,11 @@ import nocrafting.map.MapObject;
 import gfx.CGraphics;
 import gfx.CImage;
 import gfx.Drawable;
+import java.util.ArrayList;
 import java.util.List;
 import nocrafting.Global;
+import nocrafting.items.ActorInventory;
+import nocrafting.items.Item;
 import nocrafting.map.MapEffect;
 
 /**
@@ -19,11 +22,12 @@ import nocrafting.map.MapEffect;
  * @author Simon
  */
 public abstract class Actor implements Drawable{
+    
     //maximum motion per frame, pixels
-    private static final double maxWalkDist = 1;
+    protected static final double maxWalkDist = 1;
     
     //movement speed, pixels/millisec
-    private static final double walkSpeed = .04;
+    protected static final double walkSpeed = .04;
     
     //distance walked in last update
     public double walkDist = 0;
@@ -42,6 +46,9 @@ public abstract class Actor implements Drawable{
     
     //set as non-null if the actor is effecting the game map
     public MapEffect currentEffect = null;
+    
+    //object to handle inventory
+    public final ActorInventory inventory = new ActorInventory( 6 );
     
     public Actor( int xPos, int yPos ){
         this.xPos = xPos;

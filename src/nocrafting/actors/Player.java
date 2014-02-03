@@ -17,7 +17,10 @@ import org.lwjgl.input.Keyboard;
  * @author Oliver
  */
 public class Player extends Person{
-    //keybindings
+    //control settings
+    private static final int walkDelay = 100; //the time it takes (ms) to actually strt walking after turning
+    private int lastDirectionCommand = -1;
+    private int walkDelayTimer = walkDelay;
     
     //Player should ONLY be constructed in global
     public Player(int xPos, int yPos){super(xPos, yPos);}
@@ -32,26 +35,39 @@ public class Player extends Person{
     public void update( List< MapObject > objs, long ms ){
         super.update( objs, ms );
         
-        if( Keyboard.isKeyDown( Global.KEY_MOVE_LEFT ) ){
-            state.setDirection( ActorAnimState.DIR_LEFT );
-            state.setState( ActorAnimState.STATE_WALKING );
+        int dirInput = getDirectionalInput();
         
-        }else if( Keyboard.isKeyDown( Global.KEY_MOVE_RIGHT ) ){
-            state.setDirection( ActorAnimState.DIR_RIGHT );
-            state.setState( ActorAnimState.STATE_WALKING );
+        if( dirInput != lastDirectionCommand ){
+            walkDelayTimer = walkDelay;
+            lastDirectionCommand = dirInput;
+        }
         
-        }else if( Keyboard.isKeyDown( Global.KEY_MOVE_UP ) ){
-            state.setDirection( ActorAnimState.DIR_UP );
-            state.setState( ActorAnimState.STATE_WALKING );
+        if( walkDelayTimer > 0 ){
+            walkDelayTimer -= ms;
+            if( dirInput > -1 )
+                state.setDirection( dirInput );
         
-        }else if( Keyboard.isKeyDown( Global.KEY_MOVE_DOWN ) ){
-            state.setDirection( ActorAnimState.DIR_DOWN );
+        }else if( dirInput > -1 ){
+            state.setDirection( dirInput );
             state.setState( ActorAnimState.STATE_WALKING );
         
         }else
             state.setState( ActorAnimState.STATE_STANDING );
         
         state.updateAnimIndex();
+    }
+    
+    private int getDirectionalInput(){
+        if( Keyboard.isKeyDown( Global.KEY_MOVE_LEFT ) )
+            return ActorAnimState.DIR_LEFT;
+        else if( Keyboard.isKeyDown( Global.KEY_MOVE_RIGHT ) )
+            return ActorAnimState.DIR_RIGHT;
+        else if( Keyboard.isKeyDown( Global.KEY_MOVE_UP ) )
+            return ActorAnimState.DIR_UP;
+        else if( Keyboard.isKeyDown( Global.KEY_MOVE_DOWN ) )
+            return ActorAnimState.DIR_DOWN;
+        else
+            return -1;
     }
 
     //<editor-fold desc="main() produces verboseString for sprites in getResourceImage( "player" )" defaultstate="collapsed">

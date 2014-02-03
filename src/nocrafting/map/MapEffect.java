@@ -6,10 +6,24 @@
 
 package nocrafting.map;
 
+import nocrafting.actors.Actor;
+
 /**
  *
  * @author Oliver
  */
-public enum MapEffect {
-    DIG;
+public abstract class MapEffect {
+    
+    //stores a pointer to the actor that did the effect
+    public final Actor sender;
+    
+    private MapEffect( Actor sender ){
+        this.sender = sender;
+    }
+    
+    public static class Dig extends MapEffect{
+        public Dig(Actor sender) {
+            super(sender);
+        }
+    }
 }

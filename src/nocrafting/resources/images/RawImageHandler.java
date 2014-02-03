@@ -25,7 +25,8 @@ public class RawImageHandler {
             /*"diglett_icon",*/"doors", "font", /*"grass",/* "objects_raw", /*"people",*/ "pokecenter",
             "overworld_tiles", /*"tree",*/ "harvested_tree", "interiors", "exit_tile",
             "water_animation", "shoreline_animation", "grass_sand_edge", 
-            "oldale_grass_edge", /*"upladder",*/ "secret_base_tiles", "cave_tiles"/*"player"*/
+            "oldale_grass_edge", /*"upladder",*/ "secret_base_tiles", "cave_tiles"/*"player"*/,
+            "rock"
         })
         resourceImages.put( s, loadResourceImage( s + ".png" ) );
         System.out.println( "done!" );

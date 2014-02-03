@@ -7,11 +7,22 @@
 package nocrafting.actors;
 
 import gfx.CImage;
+import nocrafting.Global;
+import org.lwjgl.input.Keyboard;
 
 /**
  *
  * @author Oliver
  */
-public interface Pokemon {
+public abstract class Pokemon extends RandomPerson{
+
+    //while false, this pokemon will move randomly
+    public boolean summoned = false;
+    
+    public Pokemon(int xPos, int yPos) {
+        super(xPos, yPos);
+    }
     abstract public CImage getIcon();
+    
+    abstract public void startSummonBehavior( int dir );
 }

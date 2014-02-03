@@ -20,7 +20,7 @@ public abstract class MapObject implements Drawable{
     
     public int xPos, yPos;
     
-    private final CImage sprite;
+    protected final CImage sprite;
     
     public MapObject( int xPos, int yPos ){
         this.xPos = xPos;

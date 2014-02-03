@@ -7,7 +7,10 @@
 package nocrafting;
 
 import gfx.CGraphics;
+import nocrafting.actors.Pokemon;
 import nocrafting.map.GameMap;
+import nocrafting.map.MinimapDrawer;
+import org.lwjgl.input.Keyboard;
 
 /**
  *
@@ -33,18 +36,24 @@ public class PlayScreen extends Screen{
         
         g.translate( camX, camY );
         
+        //fill background black
         g.fill( (byte)0x00 );
-        g.setColor( (byte)0xFF );
-        g.fillRect( 0, 0, 20, 20 );
         
+        //draw the map
         map.draw( g );
         
         g.translate( -camX, -camY );
         
+        //minimap
+        MinimapDrawer.draw( map.getCurrentLayer(), g );
+        
+        //the belt
         Global.playerBelt.drawHudView( g );
         
+        //debug 
         g.drawString( "POS: " + ((int)Global.player.xPos/Global.tileSize) + ", " + ((int)Global.player.yPos/Global.tileSize), 50, 0 );
         
+        //game message
         if( hudMessage != null )
             g.drawStringCentered( hudMessage, Global.screenWidth/2, Global.screenHeight/2+Global.tileSize*2 );
     }
@@ -52,6 +61,8 @@ public class PlayScreen extends Screen{
     @Override
     public void update(long ms) {
         map.update( ms );
+        
+        Global.playerBelt.update( ms );
         
         if( hudMessageTimer >= 0 ) 
             hudMessageTimer -= ms;

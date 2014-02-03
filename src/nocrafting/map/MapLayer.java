@@ -8,7 +8,6 @@ package nocrafting.map;
 
 import gfx.CGraphics;
 import gfx.CImage;
-import gfx.ColorUtil;
 import gfx.Drawable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +17,8 @@ import java.util.Map;
 import nocrafting.Global;
 import nocrafting.actors.Actor;
 import nocrafting.actors.ActorAnimState;
+import nocrafting.actors.Pokemon;
+import org.lwjgl.input.Keyboard;
 
 /**
  *
@@ -43,8 +44,11 @@ public abstract class MapLayer {
     //contains layout information
     protected final int[][] layoutArr;
     
-    //regularly updated, non-null indicies indicate an occupied tile
-    private final boolean[][] occupiedTiles;
+    //regularly updated, trueindicies indicate an actor-occupied tile
+    private final boolean[][] tilesOccupiedByActors;
+    
+    //true indices indicate a collideable tile-based object occupying the tile
+    private final boolean[][] tilesOccupiedByObjects;
     
     //contains edge-minitile information [cornerIndex][x][y]
     private final int[][][] miniTileLayout;
@@ -59,6 +63,8 @@ public abstract class MapLayer {
         this.w = w;
         this.h = h;
         this.tileset = tileset;
+        tilesOccupiedByActors = new boolean[w][h];
+        tilesOccupiedByObjects = new boolean[w][h];
         layoutArr = buildLayoutArr();
         tileImages = tileset.buildTiles();
         minitileImages = tileset.buildMinitiles();
@@ -68,15 +74,23 @@ public abstract class MapLayer {
         for( int x = 0 ; x < w ; x++ )
             for( int y = 0 ; y < h ; y++ )
                 updateTileEdges( x, y );
-        occupiedTiles = new boolean[w][h];
     }
     
     public void addObject( MapObject mo ){
         objects.add( mo );
+        if( TiledObject.class.isAssignableFrom(mo.getClass()) ){
+            TiledObject to = (TiledObject)mo;
+            if( to.isWalkable() )
+                return;
+            for( int x = 0 ; x < to.widthInTiles ; x++ )
+                for( int y = 0 ; y < to.heightInTiles ; y++ )
+                    tilesOccupiedByObjects[to.xPos/Global.tileSize+x][to.yPos/Global.tileSize+y] = true;
+        }
     }
     
     public void addActor( Actor a ){
-        actors.add( a );
+        if( !actors.contains( a ) )
+            actors.add( a );
     }
     
     public void removePlayer(){
@@ -138,11 +152,11 @@ public abstract class MapLayer {
         //set all tiles as unnoccupied
         for( x = 0 ; x < w ; x++ )
             for( y = 0 ; y < h ; y++ )
-                occupiedTiles[x][y] = false;
+                tilesOccupiedByActors[x][y] = false;
         
         //set tiles with objects as occupied
         for( MapObject mo : objects  )
-            occupiedTiles[mo.xPos/Global.tileSize][mo.yPos/Global.tileSize] = false;
+            tilesOccupiedByActors[mo.xPos/Global.tileSize][mo.yPos/Global.tileSize] = false;
 //        
 //        //set tiles with actors in them as occupied
 //        for( Actor a : actors ){
@@ -186,7 +200,21 @@ public abstract class MapLayer {
                         goPreviousLevel = true;
             }
         }
-            
+        
+        //if the player pressed the "USE POKEMON" key, check if there's a pokemon selected...
+        if( Global.player.state.getState() == ActorAnimState.STATE_STANDING && Keyboard.isKeyDown( Global.KEY_USE_POKEMON ) ){
+            Pokemon p = Global.playerBelt.getSelectedPokemon();
+            if( p != null && !p.summoned ){
+                p.xPos = Global.player.xPos + Global.tileSize*Global.player.state.getDx()/2;
+                p.yPos = Global.player.yPos + Global.tileSize*Global.player.state.getDy()/2;
+                p.startSummonBehavior( Global.player.state.getDirection() );
+                addActor( p );
+            }
+        }
+        
+        //remove any "unsummoned" pokemon from the map
+        actors.removeAll( Global.playerBelt.listUnsummonedPokemon() );
+        
         //advance tile animation timer and return, unless it's time to update tile animations
         animationTimer -= ms;
         if( animationTimer <= 0 ){
@@ -214,7 +242,7 @@ public abstract class MapLayer {
     abstract protected void applyEffect( MapEffect effect, int tileX, int tileY );
     
     private boolean isTileOccupied( int tx, int ty, Actor except ){
-        if( occupiedTiles[tx][ty] )
+        if( tilesOccupiedByActors[tx][ty] )
             return true;
         for( Actor a : actors ){
             if( a.equals( except ) )
@@ -228,10 +256,8 @@ public abstract class MapLayer {
     protected boolean isTileWalkable(int xIndex, int yIndex) {
         if( xIndex < 0 || xIndex >= w || yIndex < 0 || yIndex >= h )
             return false;
-        for( MapObject o : objects )
-            if( TiledObject.class.isAssignableFrom(o.getClass()) )
-                if( !((TiledObject)o).isWalkable() && ((TiledObject)o).containsTile( xIndex, yIndex ) )
-                    return false;
+        if( tilesOccupiedByObjects[xIndex][yIndex] )
+            return false;
         return tileset.isTileIDWalkable( layoutArr[xIndex][yIndex] );
     }
     
