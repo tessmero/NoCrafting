@@ -64,7 +64,7 @@ public class Diglett extends Pokemon{
     }
     
     @Override
-    public CImage getIcon() {
+    public CImage buildIcon() {
 //        CImage result = new CImage( RawImageHandler.getInstance().getResourceImage( "diglett_icon" ) );
 //        System.out.println( "private static final CImage icon = new CImage( \"" + result.toVerboseString() + "\" );" );
 //        return result;

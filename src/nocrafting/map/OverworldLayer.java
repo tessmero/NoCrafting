@@ -26,14 +26,10 @@ public class OverworldLayer extends MapLayer {
     }
     
     @Override //spawn location in tile index
-    public int getSpawnX() {
-        return 20;
-    }
-
+    public int getSpawnX() {return 20;}
+    
     @Override
-    public int getSpawnY() {
-        return 15;
-    }
+    public int getSpawnY() {return 15;}
     
 //    @Override
 //    public void draw( CGraphics g ){

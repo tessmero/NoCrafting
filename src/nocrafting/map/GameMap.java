@@ -72,7 +72,7 @@ public class GameMap {
     private MapLayer buildLayer( int level ){
         MapLayer result = new CaveLayer();
         result.addObject( new UpLadder( (int)Global.player.xPos, (int)Global.player.yPos ) );
-        Global.messageQueue.add( "use [q]/[e] to select diglett" );
+        Global.messageQueue.add( "press [c] to capture" );
         Global.messageQueue.add( "press and hold [x] to dig" );
         return result;
     }

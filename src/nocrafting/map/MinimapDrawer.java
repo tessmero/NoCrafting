@@ -25,6 +25,6 @@ public class MinimapDrawer {
         for( int x = 0 ; x < w ; x++ )
             for( int y = 0 ; y < h ; y++ )
                 if( layer.isTileWalkable( x, y ) )
-                    g.pushBuffer( x, y, walkableTileColor );
+                    g.pushColorBuffer( x, y, walkableTileColor );
     }
 }

@@ -21,7 +21,8 @@ public class MainMenuScreen extends Screen{
     
     @Override
     public void draw(CGraphics g) {
-        g.fill( (byte)0xFF );        
+        g.fillBrightness( (byte)127 );        
+        g.fillColor( (byte)127 );
         
         g.drawStringCentered( "SINGLE PLAYER", Global.screenWidth/2, Global.screenHeight/2 + 2*(Font.charHeight+2) );
         g.drawStringCentered( "NO CRAFTING", Global.screenWidth/2, Global.screenHeight/2 + Font.charHeight+2 );

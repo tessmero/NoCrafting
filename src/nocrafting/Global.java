@@ -34,6 +34,9 @@ public class Global {
     //one game-pixel will contain pixelScaling^2 real-pixels
     public static final int pixelScaling = 2;
     
+    //one pixel of brightness info will contain brightScaling^2 game-pixels
+    public static final int brightScaling = 4;
+    
     //screen dimensions in game-pixels
     public static final int screenWidth = 640/pixelScaling;
     public static final int screenHeight = 480/pixelScaling;

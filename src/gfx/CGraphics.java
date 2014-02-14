@@ -25,11 +25,13 @@ public class CGraphics {
     private static final int TARGETFPS = 60;
     private int REALFPS = 0;
     
-    //data, one byte per pixel
-    private final byte[] buffer;
+    //color data, one byte per game-pixel
+    private final byte[] colorBuffer;
+    private final int colorW,colorH,colorN;
     
-    //viewable dimensions in game-pixels
-    private final int w,h,n;
+    //brightness information, at MOST one byte per pixel
+    private final byte[] brightnessBuffer;
+    private final int brightW, brightH, brightN;
     
     //current drawing context
     private int drawingMode = MODE_REPLACE; //on eof the MODE constants above
@@ -38,10 +40,17 @@ public class CGraphics {
     private int drawOffsetY = 0;
     
     public CGraphics( int w, int h ){        
-        this.w = w;
-        this.h = h;
-        this.n = w*h;
-        this.buffer = new byte[n];
+        colorW = w;
+        colorH = h;
+        colorN = w*h;
+        colorBuffer = new byte[colorN];
+        
+        brightW = w/Global.brightScaling;
+        brightH = h/Global.brightScaling;
+        brightN = brightW * brightH;
+        brightnessBuffer = new byte[brightN];
+        for( int i = 0 ; i < brightN ; i++ )
+            brightnessBuffer[i] = (byte)128;
     }
     
     public void setColor( byte b ){
@@ -54,13 +63,13 @@ public class CGraphics {
     
     public void drawRect( int x, int y, int w, int h ){
         for( int i = 0 ; i < w ; i++ ){
-            pushBuffer( x+i, y, drawColor );
-            pushBuffer( x+i, y+h-1, drawColor );
+            pushColorBuffer( x+i, y, drawColor );
+            pushColorBuffer( x+i, y+h-1, drawColor );
         }
         
         for( int i = 1 ; i < h-1 ; i++ ){
-            pushBuffer( x, y+i, drawColor );
-            pushBuffer( x+w-1, y+i, drawColor );
+            pushColorBuffer( x, y+i, drawColor );
+            pushColorBuffer( x+w-1, y+i, drawColor );
         }
     }
     
@@ -81,12 +90,17 @@ public class CGraphics {
     public void fillRect( int x, int y, int w, int h ){
         for( int i = 0 ; i < w ; i++ )
             for( int j = 0 ; j < h ; j++ )
-                pushBuffer( x+i, y+j, drawColor );
+                pushColorBuffer( x+i, y+j, drawColor );
     }
     
-    public void fill( byte b ){
-        for( int i = 0 ; i < n ; i++ )
-            buffer[i] = b;
+    public void fillColor( byte b ){
+        for( int i = 0 ; i < colorN ; i++ )
+            colorBuffer[i] = b;
+    }
+    
+    public void fillBrightness( byte b ){
+        for( int i = 0 ; i < brightN ; i++ )
+            brightnessBuffer[i] = b;
     }
     
     public void translate( int x, int y ){
@@ -99,7 +113,7 @@ public class CGraphics {
         for( int y = 0 ; y < ci.h ; y++ ){
             for( int x = 0 ; x < ci.w ; x++ ){
                 if( ci.opacity[i] )
-                    pushBuffer( x+ox, y+oy, ci.pixels[i] );
+                    pushColorBuffer( x+ox, y+oy, ci.pixels[i] );
                 i++;
             }
         }
@@ -114,27 +128,66 @@ public class CGraphics {
         for( int y = 0 ; y < ci.h ; y++ ){
             for( int x = 0 ; x < ci.w ; x++ ){
                 if( ci.opacity[i] )
-                    pushBuffer( x, y, ci.pixels[i] );
+                    pushColorBuffer( x, y, ci.pixels[i] );
                 i++;
             }
         }
     }
+    
+    public void illuminate( int cx, int cy, int maxR, int brightness ){
+        brightness /= Global.brightScaling * Global.brightScaling;
+        int maxR2 = maxR * maxR;
+        for( int dx = -maxR ; dx <= maxR ; dx++ ){
+            for( int dy = -maxR ; dy <= maxR ; dy++ ){
+                int r2 = dx*dx + dy*dy;
+                if( r2 <= maxR2 )
+                    pushBrightnessBuffer( cx+dx, cy+dy, 
+                            (int)(brightness*(1f-(float)r2/maxR2)));
+            }
+        }
         
+//        //debug
+//        printBrightnessBuffer();
+//        System.exit( 0 );
+    }
+    
+//    //debug
+//    public void printBrightnessBuffer(){
+//        int i = 0;
+//        for( int y = 0 ; y < brightH ; y++ ){
+//            for( int x = 0 ; x < brightW ; x++ ){
+//                System.out.print( (int)brightnessBuffer[i++] + "\t" );
+//            }
+//            System.out.println();
+//        }
+//    }
+        
+    public void pushBrightnessBuffer( int x, int y, int amt ){
+        x += drawOffsetX;
+        y += drawOffsetY;
+        x /= Global.brightScaling;
+        y /= Global.brightScaling;
+        if( x < 0 || x >= brightW || y < 0 || y >= brightH )
+            return;
+        int i2 = y*brightW+x;
+        brightnessBuffer[i2] += amt;// = (byte)Math.min( brightnessBuffer[i2]+amt, 127 );
+    }
+    
     //push one pixel to the buffer, 
     //coordiantes here are relative to translation offsets
     //does nothing if coordinates are outside of viewport
-    public void pushBuffer( int x, int y, byte b ){
+    public void pushColorBuffer( int x, int y, byte color ){
         x += drawOffsetX;
         y += drawOffsetY;
-        if( x < 0 || x >= w || y < 0 || y >= h )
+        if( x < 0 || x >= colorW || y < 0 || y >= colorH )
             return;
-        int i2 = y*w+x;
+        int i2 = y*colorW+x;
         
-        if( i2 >= 0 && i2 < n ){
+        if( i2 >= 0 && i2 < colorN ){
             if( drawingMode == MODE_ADD )
-                buffer[i2] += b;
+                colorBuffer[i2] += color;
             else if( drawingMode == MODE_REPLACE )
-                buffer[i2] = b;
+                colorBuffer[i2] = color;
             else
                 throw new Error( "invalid drawing mode" );
         }
@@ -148,13 +201,16 @@ public class CGraphics {
         glPushMatrix();
         glBegin(GL_QUADS);
         int i = 0;
-        for( int y = 0 ; y < h ; y++ ){
-            for( int x = 0 ; x < w ; x++ ){
-                byte b = buffer[i++];
+        for( int y = 0 ; y < colorH ; y++ ){
+            for( int x = 0 ; x < colorW ; x++ ){
+                byte color = colorBuffer[i++];
+                double brightness = (brightnessBuffer[
+                        (y/Global.brightScaling)*brightW
+                        +(x/Global.brightScaling)]+128) / 256.0;
                 GL11.glColor3d( 
-                    ( ( b & 0xE0 ) >>> 5 ) / 7.0, 
-                    ( ( b & 0x1C ) >>> 2 ) / 7.0,
-                      ( b & 0x03 )         / 3.0 );        
+                    brightness * ( ( color & 0xE0 ) >>> 5 ) / 7.0, 
+                    brightness * ( ( color & 0x1C ) >>> 2 ) / 7.0,
+                    brightness *   ( color & 0x03 )         / 3.0 );
                 glVertex2i(x,y);
                 glVertex2i(x+1,y);
                 glVertex2i(x+1,y+1);
@@ -178,8 +234,8 @@ public class CGraphics {
     }
     
     public void initDisplay() throws LWJGLException{
-        int realWidth = w*Global.pixelScaling;
-        int realHeight = h*Global.pixelScaling;
+        int realWidth = colorW*Global.pixelScaling;
+        int realHeight = colorH*Global.pixelScaling;
         boolean set = false;
         for( DisplayMode dm : Display.getAvailableDisplayModes() ){
             if( dm.isFullscreenCapable() == Global.fullscreen && dm.getWidth() == realWidth && dm.getHeight() == realHeight ){
@@ -196,7 +252,7 @@ public class CGraphics {
         glLoadIdentity();
         //glLineWidth( 3f );
         glMatrixMode( GL_PROJECTION );
-        glOrtho(0,w,0,h,1,-1);
+        glOrtho(0,colorW,0,colorH,1,-1);
         //glMatrixMode(GL_MODELVIEW);
         //glEnable( GL_TEXTURE_2D );
         //glClearColor( 0,0,0,0 );

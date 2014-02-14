@@ -22,7 +22,7 @@ public class RawImageHandler {
     private RawImageHandler(){
         System.out.print( "loading raw images from resources... " );
         for( String s : new String[]{
-            /*"diglett_icon",*/"doors", "font", /*"grass",/* "objects_raw", /*"people",*/ "pokecenter",
+            /*"diglett_icon",*/"fern","doors", "font", /*"grass",/* "objects_raw", /*"people",*/ "pokecenter",
             "overworld_tiles", /*"tree",*/ "harvested_tree", "interiors", "exit_tile",
             "water_animation", "shoreline_animation", "grass_sand_edge", 
             "oldale_grass_edge", /*"upladder",*/ "secret_base_tiles", "cave_tiles"/*"player"*/,

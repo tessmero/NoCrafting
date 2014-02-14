@@ -26,7 +26,7 @@ public class ActorInventory {
     
     private int[] quantityArr;
     
-    private int size;
+    public final int size;
     
     public ActorInventory( int size ){
         this.size = size;

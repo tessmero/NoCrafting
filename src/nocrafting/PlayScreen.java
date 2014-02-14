@@ -37,7 +37,7 @@ public class PlayScreen extends Screen{
         g.translate( camX, camY );
         
         //fill background black
-        g.fill( (byte)0x00 );
+        g.fillColor( (byte)0x00 );
         
         //draw the map
         map.draw( g );

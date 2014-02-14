@@ -18,6 +18,8 @@ import nocrafting.Global;
 import nocrafting.actors.Actor;
 import nocrafting.actors.ActorAnimState;
 import nocrafting.actors.Pokemon;
+import nocrafting.map.flavor.CaptureEffect;
+import nocrafting.map.flavor.StaticDecayingObject;
 import org.lwjgl.input.Keyboard;
 
 /**
@@ -154,10 +156,20 @@ public abstract class MapLayer {
             for( y = 0 ; y < h ; y++ )
                 tilesOccupiedByActors[x][y] = false;
         
-        //set tiles with objects as occupied
-        for( MapObject mo : objects  )
-            tilesOccupiedByActors[mo.xPos/Global.tileSize][mo.yPos/Global.tileSize] = false;
-//        
+        //decay objects that decay
+        MapObject obj;
+        for( int i = 0 ; i < objects.size() ; i++  ){
+            obj = objects.get( i );
+            if( StaticDecayingObject.class.isAssignableFrom( obj.getClass() ) ){
+                StaticDecayingObject sdo = (StaticDecayingObject)obj;
+                sdo.lifetime -= ms;
+                if( sdo.lifetime <= 0 ){
+                    objects.remove( i );
+                    i--;
+                }
+            }
+        }
+//            
 //        //set tiles with actors in them as occupied
 //        for( Actor a : actors ){
 //            x = a.getXTileIndex();
@@ -201,14 +213,32 @@ public abstract class MapLayer {
             }
         }
         
-        //if the player pressed the "USE POKEMON" key, check if there's a pokemon selected...
-        if( Global.player.state.getState() == ActorAnimState.STATE_STANDING && Keyboard.isKeyDown( Global.KEY_USE_POKEMON ) ){
-            Pokemon p = Global.playerBelt.getSelectedPokemon();
-            if( p != null && !p.summoned ){
-                p.xPos = Global.player.xPos + Global.tileSize*Global.player.state.getDx()/2;
-                p.yPos = Global.player.yPos + Global.tileSize*Global.player.state.getDy()/2;
-                p.startSummonBehavior( Global.player.state.getDirection() );
-                addActor( p );
+        if( Global.player.state.getState() == ActorAnimState.STATE_STANDING ){
+            //if the player pressed the "USE POKEMON" key, check if there's a pokemon selected...
+            if( Keyboard.isKeyDown( Global.KEY_USE_POKEMON ) ){
+                Pokemon p = Global.playerBelt.getSelectedPokemon();
+                if( p != null && !p.summoned ){
+                    p.xPos = Global.player.xPos + Global.tileSize*Global.player.state.getDx()/2;
+                    p.yPos = Global.player.yPos + Global.tileSize*Global.player.state.getDy()/2;
+                    p.startSummonBehavior( Global.player.state.getDirection() );
+                    addActor( p );
+                }
+            
+            //if the player pressed the "CAPTURE" key...
+            }else if( Keyboard.isKeyDown( Global.KEY_CAPTURE ) ){
+                for( Actor a : actors ){
+                    if( Pokemon.class.isAssignableFrom( a.getClass() ) ){
+                        final Pokemon p = (Pokemon)a;
+                        if( Global.playerBelt.tryCapture( p ) )
+                            objects.add( new CaptureEffect( (int)a.xPos, (int)a.yPos ){
+                            @Override
+                            protected CImage buildSprite() {
+                                return p.silhouetteImage;
+                            }
+                        } );
+                        break;
+                    }
+                }
             }
         }
         

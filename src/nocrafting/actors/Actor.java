@@ -48,7 +48,7 @@ public abstract class Actor implements Drawable{
     public MapEffect currentEffect = null;
     
     //object to handle inventory
-    public final ActorInventory inventory = new ActorInventory( 6 );
+    public final ActorInventory inventory = new ActorInventory( 1 );
     
     public Actor( int xPos, int yPos ){
         this.xPos = xPos;

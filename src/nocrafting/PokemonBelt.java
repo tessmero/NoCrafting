@@ -38,7 +38,7 @@ public class PokemonBelt {
     public PokemonBelt( int nSlots ){
         this.nSlots = nSlots;
         team = new Pokemon[nSlots];
-        team[0] = new Diglett(0,0);
+//        team[0] = new Diglett(0,0);
     }
     
     public Pokemon getSelectedPokemon(){
@@ -51,6 +51,21 @@ public class PokemonBelt {
             if( p!=null && !p.summoned )
                 result.add( p );
         return result;
+    }
+
+    public boolean tryCapture(Pokemon p) {
+        int openIndex = -1;
+        for( int i = 0 ; i < nSlots ; i++ ){
+            if( team[i] == null ){
+                openIndex = i;
+                break;
+            }
+        }
+        if( openIndex == -1 )
+            return false;
+        team[openIndex] = p;
+        p.summoned = false;
+        return true;
     }
     
     public void update( long ms ){
@@ -87,12 +102,12 @@ public class PokemonBelt {
             if( i != selectedIndex )
                 g.drawRect( drawX, drawY, iconBorderSize, iconBorderSize );
             if( team[i] != null ){
-                g.drawImageCentered( team[i].getIcon(), 
+                g.drawImageCentered( team[i].icon, 
                     drawX + iconBorderSize/2, 
                     drawY + iconBorderSize/2 );
-                g.translate( drawX, 116 );
+                g.translate( drawX+2, Global.screenHeight-40 );
                 team[i].inventory.draw( g );
-                g.translate( -drawX, -116 );
+                g.translate( -(drawX+2), -(Global.screenHeight-40) );
             }
             drawX += iconBorderSize;
         }
