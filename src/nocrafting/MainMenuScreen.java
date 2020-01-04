@@ -20,8 +20,7 @@ public class MainMenuScreen extends Screen{
     public static MainMenuScreen getInstance(){ return instance; }
     
     @Override
-    public void draw(CGraphics g) {
-        g.fillBrightness( (byte)127 );        
+    public void draw(CGraphics g) {    
         g.fillColor( (byte)127 );
         
         g.drawStringCentered( "SINGLE PLAYER", Global.screenWidth/2, Global.screenHeight/2 + 2*(Font.charHeight+2) );

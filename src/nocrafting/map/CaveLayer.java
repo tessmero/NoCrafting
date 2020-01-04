@@ -33,11 +33,6 @@ public class CaveLayer extends MapLayer {
     
     @Override
     public void draw( CGraphics g ){
-        
-        //set brightness to dim
-        g.fillBrightness( (byte)0 );
-        
-        //draw layer tiles the standard way
         super.draw( g );
     }
 
@@ -71,7 +66,6 @@ public class CaveLayer extends MapLayer {
         }
         
         addActor( new Diglett( (w/2+3)*Global.tileSize, (h/2)*Global.tileSize ) );
-        addObject( new Item.GlowFern( (w/2+1)*Global.tileSize, (h/2)*Global.tileSize ) );
         
         //assign appropriate corner/edge tiles
         for( int x = 1 ; x < w-1 ; x++ ){

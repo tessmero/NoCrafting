@@ -24,7 +24,5 @@ public abstract class CaptureEffect extends StaticDecayingObject{
     @Override
     public void draw( CGraphics g ){
         super.draw( g );
-        
-        g.illuminate(xPos+sprite.w/2, yPos+sprite.h/2, 20, (int)(120*((float)lifetime/duration)) );
     }
 }

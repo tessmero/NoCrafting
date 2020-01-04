@@ -29,10 +29,6 @@ public class CGraphics {
     private final byte[] colorBuffer;
     private final int colorW,colorH,colorN;
     
-    //brightness information, at MOST one byte per pixel
-    private final byte[] brightnessBuffer;
-    private final int brightW, brightH, brightN;
-    
     //current drawing context
     private int drawingMode = MODE_REPLACE; //on eof the MODE constants above
     private byte drawColor = (byte)0;
@@ -44,13 +40,6 @@ public class CGraphics {
         colorH = h;
         colorN = w*h;
         colorBuffer = new byte[colorN];
-        
-        brightW = w/Global.brightScaling;
-        brightH = h/Global.brightScaling;
-        brightN = brightW * brightH;
-        brightnessBuffer = new byte[brightN];
-        for( int i = 0 ; i < brightN ; i++ )
-            brightnessBuffer[i] = (byte)128;
     }
     
     public void setColor( byte b ){
@@ -98,11 +87,6 @@ public class CGraphics {
             colorBuffer[i] = b;
     }
     
-    public void fillBrightness( byte b ){
-        for( int i = 0 ; i < brightN ; i++ )
-            brightnessBuffer[i] = b;
-    }
-    
     public void translate( int x, int y ){
         drawOffsetX += x;
         drawOffsetY += y;
@@ -132,45 +116,6 @@ public class CGraphics {
                 i++;
             }
         }
-    }
-    
-    public void illuminate( int cx, int cy, int maxR, int brightness ){
-        brightness /= Global.brightScaling * Global.brightScaling;
-        int maxR2 = maxR * maxR;
-        for( int dx = -maxR ; dx <= maxR ; dx++ ){
-            for( int dy = -maxR ; dy <= maxR ; dy++ ){
-                int r2 = dx*dx + dy*dy;
-                if( r2 <= maxR2 )
-                    pushBrightnessBuffer( cx+dx, cy+dy, 
-                            (int)(brightness*(1f-(float)r2/maxR2)));
-            }
-        }
-        
-//        //debug
-//        printBrightnessBuffer();
-//        System.exit( 0 );
-    }
-    
-//    //debug
-//    public void printBrightnessBuffer(){
-//        int i = 0;
-//        for( int y = 0 ; y < brightH ; y++ ){
-//            for( int x = 0 ; x < brightW ; x++ ){
-//                System.out.print( (int)brightnessBuffer[i++] + "\t" );
-//            }
-//            System.out.println();
-//        }
-//    }
-        
-    public void pushBrightnessBuffer( int x, int y, int amt ){
-        x += drawOffsetX;
-        y += drawOffsetY;
-        x /= Global.brightScaling;
-        y /= Global.brightScaling;
-        if( x < 0 || x >= brightW || y < 0 || y >= brightH )
-            return;
-        int i2 = y*brightW+x;
-        brightnessBuffer[i2] += amt;// = (byte)Math.min( brightnessBuffer[i2]+amt, 127 );
     }
     
     //push one pixel to the buffer, 
@@ -204,13 +149,10 @@ public class CGraphics {
         for( int y = 0 ; y < colorH ; y++ ){
             for( int x = 0 ; x < colorW ; x++ ){
                 byte color = colorBuffer[i++];
-                double brightness = (brightnessBuffer[
-                        (y/Global.brightScaling)*brightW
-                        +(x/Global.brightScaling)]+128) / 256.0;
                 GL11.glColor3d( 
-                    brightness * ( ( color & 0xE0 ) >>> 5 ) / 7.0, 
-                    brightness * ( ( color & 0x1C ) >>> 2 ) / 7.0,
-                    brightness *   ( color & 0x03 )         / 3.0 );
+                    ( ( color & 0xE0 ) >>> 5 ) / 7.0, 
+                    ( ( color & 0x1C ) >>> 2 ) / 7.0,
+                      ( color & 0x03 )         / 3.0 );
                 glVertex2i(x,y);
                 glVertex2i(x+1,y);
                 glVertex2i(x+1,y+1);
